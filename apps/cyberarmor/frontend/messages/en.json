@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "CyberArmor | Hardware-Enforced Digital Sovereignty",
+    "description": "Premium USB security token for absolute physical control over your PC, data, and digital identity."
+  },
+  "nav": {
+    "product": "Product",
+    "solutions": "Solutions",
+    "shop": "Shop",
+    "support": "Support",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "headline": "Absolute Physical Control Over Your Digital Sovereignty",
+    "subheadline": "A defense-grade USB security token that locks your PC, encrypts your data, and wipes keys on tamper. No cloud. No backdoors. Only you hold the key.",
+    "ctaPrimary": "Order SecureKey",
+    "ctaSecondary": "Request Enterprise Demo"
+  },
+  "trust": {
+    "title": "Trusted by security-first organizations",
+    "certifications": "FIPS 140-3 Level 4 · Common Criteria EAL6+ · NATO Restricted"
+  }
+}
