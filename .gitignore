@@ -60,3 +60,14 @@ apps/cyberarmor/Dockerfile
 apps/cyberarmor/docker-compose.yml
 apps/cyberarmor/backend/Dockerfile
 apps/cyberarmor/frontend/Dockerfile
+
+# Frontend generated artifacts
+apps/cyberarmor/frontend/.next/
+apps/cyberarmor/frontend/package-lock.json
+apps/cyberarmor/frontend/tsconfig.tsbuildinfo
+
+# Runtime artifacts in cyberarmor
+apps/cyberarmor/backend/*.log
+apps/cyberarmor/backend/*.pid
+apps/cyberarmor/frontend/*.log
+apps/cyberarmor/frontend/*.pid
