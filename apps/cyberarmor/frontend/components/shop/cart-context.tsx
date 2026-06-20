@@ -6,7 +6,7 @@ export interface CartItem {
   id: string;
   name: string;
   slug: string;
-  price: number;
+  price_cents: number;
   currency: string;
   quantity: number;
 }
@@ -17,7 +17,7 @@ interface CartContextValue {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  total: number;
+  total_cents: number;
   count: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -72,7 +72,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total_cents = items.reduce((sum, item) => sum + item.price_cents * item.quantity, 0);
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -83,7 +83,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
-        total,
+        total_cents,
         count,
         isOpen,
         setIsOpen,
@@ -96,6 +96,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be used within CartProvider');
+  if (!ctx) throw new Error('useCart must be used within a CartProvider');
   return ctx;
 }

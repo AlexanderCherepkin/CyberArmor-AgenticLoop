@@ -8,7 +8,10 @@ import { Footer } from '@/components/layout/footer';
 import { CartProvider } from '@/components/shop/cart-context';
 import { CartDrawer } from '@/components/shop/cart-drawer';
 import { ToastProvider } from '@/components/ui/toast-context';
+import { PrivacyConsentProvider } from '@/components/ui/privacy-context';
 import { CookieBanner } from '@/components/ui/cookie-banner';
+import { AuthProvider } from '@/components/auth/auth-context';
+import { getMessages } from '@/lib/i18n/get-messages';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -54,6 +57,16 @@ export default async function RootLayout({
     notFound();
   }
 
+  const messages = await getMessages(lang as Locale);
+  const cookieMessages = messages.cookieBanner as {
+    title: string;
+    description: string;
+    accept: string;
+    reject: string;
+    manage: string;
+    learnMore: string;
+  };
+
   return (
     <html lang={lang} className="dark">
       <body
@@ -61,11 +74,15 @@ export default async function RootLayout({
       >
         <CartProvider>
           <ToastProvider>
-            <Header lang={lang as Locale} />
-            <main className="relative overflow-x-hidden">{children}</main>
-            <CartDrawer />
-            <Footer lang={lang as Locale} />
-            <CookieBanner lang={lang as Locale} />
+            <PrivacyConsentProvider>
+              <AuthProvider>
+                <Header lang={lang as Locale} />
+                <main className="relative overflow-x-hidden">{children}</main>
+                <CartDrawer />
+                <Footer lang={lang as Locale} />
+                <CookieBanner lang={lang as Locale} messages={cookieMessages} />
+              </AuthProvider>
+            </PrivacyConsentProvider>
           </ToastProvider>
         </CartProvider>
       </body>

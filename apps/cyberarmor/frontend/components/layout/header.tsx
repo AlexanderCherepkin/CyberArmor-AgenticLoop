@@ -10,6 +10,7 @@ const navItems = (lang: Locale) => [
   { href: `/${lang}/solutions`, label: lang === 'ru' ? 'Решения' : 'Solutions' },
   { href: `/${lang}/shop`, label: lang === 'ru' ? 'Магазин' : 'Shop' },
   { href: `/${lang}/support`, label: lang === 'ru' ? 'Поддержка' : 'Support' },
+  { href: `/${lang}/solutions/enterprise`, label: lang === 'ru' ? 'Enterprise' : 'Enterprise' },
 ];
 
 export function Header({ lang }: { lang: Locale }) {
@@ -40,7 +41,7 @@ export function Header({ lang }: { lang: Locale }) {
 
         <div className="flex items-center gap-4">
           <Link
-            href={`/${lang}/dashboard`}
+            href={`/${lang}/account/dashboard`}
             className="hidden text-sm font-medium text-platinum/80 transition hover:text-cyan md:block"
           >
             {lang === 'ru' ? 'Кабинет' : 'Dashboard'}

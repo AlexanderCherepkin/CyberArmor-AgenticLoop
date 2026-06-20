@@ -3,17 +3,20 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/components/shop/cart-context';
+import { formatCents } from '@/lib/utils';
+
+export interface ProductCardProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price_cents: number;
+  currency: string;
+  image?: string;
+}
 
 interface ProductCardProps {
-  product: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-    price: number;
-    currency: string;
-    image: string;
-  };
+  product: ProductCardProduct;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -23,7 +26,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <div className="group rounded border border-platinum/10 bg-graphite/30 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-cyan/40 hover:bg-cyan/5 hover:shadow-[0_0_30px_-12px_rgba(102,252,241,0.15)]">
       <div className="relative aspect-square overflow-hidden rounded bg-obsidian">
         <Image
-          src={product.image}
+          src={product.image || '/models/placeholder.svg'}
           alt={product.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -38,7 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <div className="mt-4 flex items-center justify-between">
         <span className="font-mono text-cyan">
-          {product.currency} {product.price.toFixed(2)}
+          {formatCents(product.price_cents, product.currency)}
         </span>
         <Button
           size="sm"
@@ -47,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
               id: product.id,
               name: product.name,
               slug: product.slug,
-              price: product.price,
+              price_cents: product.price_cents,
               currency: product.currency,
             })
           }

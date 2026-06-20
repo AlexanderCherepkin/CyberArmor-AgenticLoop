@@ -1,0 +1,9 @@
+import { AuthProvider } from '@/components/auth/auth-context';
+
+export default function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <AuthProvider>{children}</AuthProvider>;
+}

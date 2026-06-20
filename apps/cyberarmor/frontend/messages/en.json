@@ -11,13 +11,83 @@
     "dashboard": "Dashboard"
   },
   "hero": {
-    "headline": "Absolute Physical Control Over Your Digital Sovereignty",
-    "subheadline": "A defense-grade USB security token that locks your PC, encrypts your data, and wipes keys on tamper. No cloud. No backdoors. Only you hold the key.",
+    "variants": {
+      "A": {
+        "headline": "Absolute Physical Control Over Your Digital Sovereignty",
+        "subheadline": "A defense-grade USB security token that locks your PC, encrypts your data, and wipes keys on tamper. No cloud. No backdoors. Only you hold the key."
+      },
+      "B": {
+        "headline": "The Last Key You Will Ever Need to Trust",
+        "subheadline": "Hardware-enforced zero trust for your devices. One physical token replaces passwords, cloud vaults, and second-factor apps."
+      }
+    },
     "ctaPrimary": "Order SecureKey",
-    "ctaSecondary": "Request Enterprise Demo"
+    "ctaSecondary": "Request Enterprise Demo",
+    "earlyAccess": {
+      "label": "Join the priority access list",
+      "placeholder": "Enter your email",
+      "submit": "Request Access",
+      "successTitle": "Secure channel established.",
+      "successMessage": "You are on the priority access list.",
+      "errorInvalid": "Please enter a valid email address.",
+      "errorSubmit": "Transmission failed. Please try again.",
+      "privacyNote": "No spam. No third-party tracking. Your email stays encrypted at rest."
+    }
   },
   "trust": {
     "title": "Trusted by security-first organizations",
     "certifications": "FIPS 140-3 Level 4 · Common Criteria EAL6+ · NATO Restricted"
+  },
+  "explodedView": {
+    "eyebrow": "Inside SecureKey",
+    "title": "Four Layers of Physical Defense",
+    "subtitle": "Scroll to disassemble the token and inspect each hardened layer.",
+    "parts": {
+      "shell": {
+        "title": "Titanium Alloy Shell",
+        "description": "Aerospace-grade titanium casing with tamper-evident seals and EMI shielding."
+      },
+      "resin": {
+        "title": "Shockproof Resin Layer",
+        "description": "Impact-absorbing resin matrix isolates components from shock, vibration, and side-channel probing."
+      },
+      "chip": {
+        "title": "EAL6+ Secure Element",
+        "description": "Common Criteria EAL6+ certified chip stores keys in an isolated secure enclave with active shielding."
+      },
+      "biometric": {
+        "title": "Biometric Scanner Array",
+        "description": "Capacitive fingerprint matcher performs on-device template comparison. Biometric data never leaves the token."
+      }
+    }
+  },
+  "testimonials": {
+    "eyebrow": "Field Validation",
+    "title": "What security leaders are saying",
+    "items": [
+      {
+        "role": "Chief Information Security Officer",
+        "industry": "Swiss Wealth Management",
+        "quote": "The only hardware token we have evaluated where the keys genuinely never enter the host operating system."
+      },
+      {
+        "role": "Head of IT Operations",
+        "industry": "Critical Infrastructure",
+        "quote": "Remote provisioning and cryptographic erasure on tamper give us a clean incident-response story."
+      },
+      {
+        "role": "Crypto Custody Architect",
+        "industry": "Digital Asset Fund",
+        "quote": "Finally a consumer-grade form factor with HSM-like separation between the key material and the user interface."
+      }
+    ]
+  },
+  "cookieBanner": {
+    "title": "Your data. Your consent.",
+    "description": "CyberArmor does not use third-party trackers. We only load analytics or marketing scripts after explicit opt-in. Essential cookies for security and language remain active.",
+    "accept": "Accept All",
+    "reject": "Reject Non-Essential",
+    "manage": "Manage Preferences",
+    "learnMore": "Privacy Policy"
   }
 }

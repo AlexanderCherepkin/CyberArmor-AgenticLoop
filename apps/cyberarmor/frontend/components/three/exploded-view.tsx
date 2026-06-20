@@ -1,33 +1,114 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { ContactShadows } from '@react-three/drei';
+import { ContactShadows, Html } from '@react-three/drei';
 import { TokenParts } from './token-parts';
+import { SVGFallback } from './svg-fallback';
+import { WebGLBoundary, hasWebGL } from './webgl-boundary';
 import { Locale } from '@/lib/i18n/config';
+
+interface ExplodedViewPart {
+  title: string;
+  description: string;
+}
+
+interface ExplodedViewMessages {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  parts: Record<'shell' | 'resin' | 'chip' | 'biometric', ExplodedViewPart>;
+}
 
 interface ExplodedViewProps {
   lang: Locale;
+  messages?: ExplodedViewMessages;
 }
 
-export function ExplodedView({ lang }: ExplodedViewProps) {
+interface TooltipProps {
+  title: string;
+  description: string;
+}
+
+function Tooltip({ title, description }: TooltipProps) {
+  return (
+    <Html distanceFactor={10} center className="pointer-events-none">
+      <div className="w-56 border border-cyan/40 bg-obsidian/95 p-3 shadow-[0_0_24px_-8px_rgba(102,252,241,0.3)] backdrop-blur-sm cyber-sharp">
+        <p className="font-heading text-xs font-semibold uppercase tracking-wide text-cyan">{title}</p>
+        <p className="mt-1 text-[11px] leading-relaxed text-platinum/80">{description}</p>
+      </div>
+    </Html>
+  );
+}
+
+export function ExplodedView({ lang, messages }: ExplodedViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [exploded, setExploded] = useState(0);
   const [hovered, setHovered] = useState<string | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [webglAvailable, setWebglAvailable] = useState(true);
   const isRu = lang === 'ru';
+
+  const t: ExplodedViewMessages = messages || {
+    eyebrow: isRu ? 'Внутреннее устройство' : 'Inside SecureKey',
+    title: isRu ? 'Четыре слоя физической защиты' : 'Four Layers of Physical Defense',
+    subtitle: isRu
+      ? 'Прокрутите вниз, чтобы разобрать токен и изучить каждый укреплённый слой.'
+      : 'Scroll to disassemble the token and inspect each hardened layer.',
+    parts: {
+      shell: {
+        title: isRu ? 'Титановый корпус' : 'Titanium Alloy Shell',
+        description: isRu
+          ? 'Корпус из титанового сплава авиационного класса с индикаторами вскрытия и EMI-экранированием.'
+          : 'Aerospace-grade titanium casing with tamper-evident seals and EMI shielding.',
+      },
+      resin: {
+        title: isRu ? 'Ударопрочный резиновый слой' : 'Shockproof Resin Layer',
+        description: isRu
+          ? 'Поглощающая удары резиновая матрица изолирует компоненты от ударов, вибрации и побочных каналов.'
+          : 'Impact-absorbing resin matrix isolates components from shock, vibration, and side-channel probing.',
+      },
+      chip: {
+        title: isRu ? 'Защищённый элемент EAL6+' : 'EAL6+ Secure Element',
+        description: isRu
+          ? 'Сертифицированный по Common Criteria EAL6+ чип хранит ключи в изолированном анклаве.'
+          : 'Common Criteria EAL6+ certified chip stores keys in an isolated secure enclave.',
+      },
+      biometric: {
+        title: isRu ? 'Биометрическая матрица' : 'Biometric Scanner Array',
+        description: isRu
+          ? 'Капацитивный сканер отпечатков выполняет сравнение шаблона прямо на устройстве.'
+          : 'Capacitive fingerprint matcher performs on-device template comparison.',
+      },
+    },
+  };
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
+    const mobileMq = window.matchMedia('(max-width: 767px)');
 
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    setReducedMotion(mq.matches);
+    setIsMobile(mobileMq.matches);
+    setWebglAvailable(hasWebGL());
+
+    const onMotionChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    const onViewportChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+
+    mq.addEventListener('change', onMotionChange);
+    mobileMq.addEventListener('change', onViewportChange);
+
+    return () => {
+      mq.removeEventListener('change', onMotionChange);
+      mobileMq.removeEventListener('change', onViewportChange);
+    };
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion) {
+      setExploded(0.5);
+      return;
+    }
 
     let trigger: { kill: () => void } | null = null;
 
@@ -41,8 +122,8 @@ export function ExplodedView({ lang }: ExplodedViewProps) {
           ease: 'none',
           scrollTrigger: {
             trigger: containerRef.current,
-            start: 'top 80%',
-            end: 'bottom 20%',
+            start: 'top 75%',
+            end: 'bottom 25%',
             scrub: 0.6,
           },
           onUpdate: () => setExploded(obj.value),
@@ -55,103 +136,62 @@ export function ExplodedView({ lang }: ExplodedViewProps) {
     };
   }, [reducedMotion]);
 
-  const labels: Record<
-    string,
-    {
-      title: string;
-      desc: string;
-    }
-  > = {
-    shell: {
-      title: isRu ? 'Бронированный корпус' : 'Hardened Shell',
-      desc: isRu
-        ? 'Алюминиевый сплав с защитой от вскрытия и EMI-экранированием.'
-        : 'Aerospace aluminum with tamper-evident seals and EMI shielding.',
-    },
-    frame: {
-      title: isRu ? 'Внутренний каркас' : 'Inner Frame',
-      desc: isRu
-        ? 'Эпоксидный каркас фиксирует компоненты при ударе и вибрации.'
-        : 'Epoxy frame locks components in place under shock and vibration.',
-    },
-    pcb: {
-      title: isRu ? 'Печатная плата' : 'PCB',
-      desc: isRu
-        ? 'Многослойная плата с защитой от побочных электромагнитных излучений.'
-        : 'Multi-layer board with side-channel emission countermeasures.',
-    },
-    chip: {
-      title: isRu ? 'Защищённый элемент' : 'Secure Element',
-      desc: isRu
-        ? 'FIPS 140-3 Level 4 чип хранит ключи в изолированной среде.'
-        : 'FIPS 140-3 Level 4 chip stores keys in an isolated secure enclave.',
-    },
-    biometric: {
-      title: isRu ? 'Биометрический сенсор' : 'Biometric Sensor',
-      desc: isRu
-        ? 'Капацитивный сканер с локальным сравнением шаблона.'
-        : 'Capacitive matcher with on-device template comparison.',
-    },
-    'bio-ring': {
-      title: isRu ? 'Индикатор статуса' : 'Status Ring',
-      desc: isRu
-        ? 'Светодиодное кольцо отображает состояние аутентификации.'
-        : 'LED ring shows authentication and lock state at a glance.',
-    },
-    usb: {
-      title: isRu ? 'USB-C коннектор' : 'USB-C Connector',
-      desc: isRu
-        ? 'Полноскоростной USB-C с защитой от перенапряжения и ESD.'
-        : 'Full-speed USB-C with over-voltage and ESD protection.',
-    },
-  };
+  const activePart = hovered ? t.parts[hovered as keyof typeof t.parts] : null;
+
+  const shouldRenderCanvas = !isMobile && webglAvailable;
 
   return (
     <div
       ref={containerRef}
-      className="relative min-h-[150vh] w-full overflow-hidden border-y border-platinum/10 bg-obsidian py-24"
+      className="relative min-h-[120vh] w-full overflow-hidden border-y border-platinum/10 bg-obsidian py-24"
     >
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-cyan">
-            {isRu ? 'Внутреннее устройство' : 'Inside SecureKey'}
-          </p>
-          <h2 className="mt-4 font-heading text-3xl font-semibold text-platinum md:text-4xl">
-            {isRu ? 'Семь слоёв физической защиты' : 'Seven Layers of Physical Defense'}
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-platinum/60">
-            {isRu
-              ? 'Прокрутите вниз, чтобы разобрать токен и увидеть, как устроена защита.'
-              : 'Scroll down to disassemble the token and see how the defense is built.'}
-          </p>
+          <p className="text-sm font-medium uppercase tracking-widest text-cyan">{t.eyebrow}</p>
+          <h2 className="mt-4 font-heading text-3xl font-semibold text-platinum md:text-4xl">{t.title}</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-platinum/60">{t.subtitle}</p>
         </div>
 
         <div className="relative grid gap-8 lg:grid-cols-[1fr_320px]">
-          <div className="h-[60vh] min-h-[400px] w-full rounded border border-platinum/10 bg-graphite/20">
-            <Canvas camera={{ position: [0, 0, 5.8], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true }}>
-              <ambientLight intensity={0.5} />
-              <directionalLight position={[5, 5, 5]} intensity={1.8} />
-              <directionalLight position={[-5, -5, -2]} intensity={0.8} color="#66FCF1" />
-              <pointLight position={[0, 2, 3]} intensity={0.6} color="#45A29E" />
-              <pointLight position={[2, -2, 2]} intensity={0.4} color="#FF3333" />
-              <TokenParts
-                exploded={reducedMotion ? 0.5 : exploded}
-                autoRotate={!reducedMotion}
-                hoveredPart={hovered}
-                onPartHover={setHovered}
-              />
-              <ContactShadows position={[0, -2.8, 0]} opacity={0.35} scale={8} blur={2.5} />
-            </Canvas>
+          <div className="relative h-[60vh] min-h-[400px] w-full border border-platinum/10 bg-graphite/20 cyber-sharp">
+            {shouldRenderCanvas ? (
+              <WebGLBoundary lang={lang} className="h-full w-full">
+                <Canvas
+                  camera={{ position: [0, 0, 5.6], fov: 45 }}
+                  dpr={[1, 2]}
+                  gl={{ antialias: true }}
+                >
+                  <ambientLight intensity={0.5} />
+                  <directionalLight position={[5, 5, 5]} intensity={1.8} />
+                  <directionalLight position={[-5, -5, -2]} intensity={0.8} color="#66FCF1" />
+                  <pointLight position={[0, 2, 3]} intensity={0.6} color="#45A29E" />
+                  <pointLight position={[2, -2, 2]} intensity={0.4} color="#FF3333" />
+                  <TokenParts
+                    exploded={reducedMotion ? 0.5 : exploded}
+                    autoRotate={!reducedMotion}
+                    hoveredPart={hovered}
+                    onPartHover={setHovered}
+                  />
+                  {hovered && activePart && (
+                    <Tooltip title={activePart.title} description={activePart.description} />
+                  )}
+                  <ContactShadows position={[0, -2.4, 0]} opacity={0.35} scale={8} blur={2.5} />
+                </Canvas>
+              </WebGLBoundary>
+            ) : (
+              <SVGFallback lang={lang} className="h-full w-full" />
+            )}
           </div>
 
-          <div className="flex flex-col justify-center space-y-4">
-            {Object.entries(labels).map(([id, label]) => {
-              const active = hovered === id || (reducedMotion && id === 'chip');
+          <div className="flex flex-col justify-center space-y-3">
+            {(['shell', 'resin', 'chip', 'biometric'] as const).map((id) => {
+              const label = t.parts[id];
+              const active = hovered === id;
               return (
                 <button
                   key={id}
                   type="button"
-                  className={`rounded border p-4 text-left transition ${
+                  className={`border p-4 text-left transition cyber-sharp ${
                     active
                       ? 'border-cyan/50 bg-cyan/10'
                       : 'border-platinum/10 bg-graphite/30 hover:border-cyan/30'
@@ -162,7 +202,7 @@ export function ExplodedView({ lang }: ExplodedViewProps) {
                   onBlur={() => setHovered(null)}
                 >
                   <h3 className="font-heading text-sm font-semibold text-platinum">{label.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-platinum/60">{label.desc}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-platinum/60">{label.description}</p>
                 </button>
               );
             })}

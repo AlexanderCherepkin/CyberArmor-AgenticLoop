@@ -1,4 +1,5 @@
 import { Locale } from '@/lib/i18n/config';
+import Link from 'next/link';
 
 export default async function EnterprisePage({
   params,
@@ -16,34 +17,24 @@ export default async function EnterprisePage({
         </h1>
         <p className="mt-4 text-platinum/70">
           {isRu
-            ? 'Заполните форму, чтобы получить персональное демо и коммерческое предложение для вашей инфраструктуры.'
-            : 'Fill in the form to receive a personalized demo and commercial proposal for your infrastructure.'}
+            ? 'Заполните многошаговую форму, чтобы получить персональное демо и коммерческое предложение для вашей инфраструктуры.'
+            : 'Complete the multi-step form to receive a personalized demo and commercial proposal for your infrastructure.'}
         </p>
 
-        <form className="mt-12 space-y-6">
-          {[
-            { name: 'name', type: 'text', label: isRu ? 'Имя' : 'Name' },
-            { name: 'email', type: 'email', label: isRu ? 'Email' : 'Email' },
-            { name: 'company', type: 'text', label: isRu ? 'Компания' : 'Company' },
-            { name: 'endpoints', type: 'number', label: isRu ? 'Количество рабочих мест' : 'Number of endpoints' },
-          ].map((field) => (
-            <div key={field.name}>
-              <label className="mb-2 block text-sm font-medium text-platinum/80">{field.label}</label>
-              <input
-                type={field.type}
-                name={field.name}
-                className="w-full rounded border border-platinum/20 bg-obsidian px-4 py-3 text-platinum outline-none transition focus:border-cyan"
-              />
-            </div>
-          ))}
-
-          <button
-            type="submit"
-            className="w-full rounded bg-cyan px-6 py-3 font-medium text-obsidian transition hover:bg-cyan/90"
+        <div className="mt-8 flex gap-4">
+          <Link
+            href={`/${lang}/solutions/enterprise/rfq`}
+            className="border border-cyan/30 bg-cyan/10 px-6 py-3 text-sm font-semibold text-cyan transition hover:bg-cyan/20"
           >
-            {isRu ? 'Отправить заявку' : 'Submit Request'}
-          </button>
-        </form>
+            {isRu ? 'Запросить предложение' : 'Request a quote'}
+          </Link>
+          <Link
+            href={`/${lang}/account/enterprise`}
+            className="border border-platinum/20 px-6 py-3 text-sm text-platinum transition hover:border-platinum/40"
+          >
+            {isRu ? 'Enterprise Console' : 'Enterprise Console'}
+          </Link>
+        </div>
       </div>
     </div>
   );

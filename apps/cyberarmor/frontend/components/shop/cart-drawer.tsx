@@ -1,14 +1,32 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useCart } from './cart-context';
-import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { X, Minus, Plus, ShoppingBag, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { apiFetchJson } from '@/lib/api/client';
+import { formatCents } from '@/lib/utils';
+import { ProductCardProduct } from './product-card';
+
+const UPSELL_SLUGS = ['securekey-case', 'securekey-spare'];
 
 export function CartDrawer() {
-  const { items, isOpen, setIsOpen, total, count, updateQuantity, removeItem } = useCart();
+  const { items, isOpen, setIsOpen, total_cents, count, updateQuantity, removeItem, addItem } = useCart();
+  const [upsells, setUpsells] = useState<ProductCardProduct[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    apiFetchJson<ProductCardProduct[]>('/products')
+      .then((products) => {
+        setUpsells(products.filter((p) => UPSELL_SLUGS.includes(p.slug)));
+      })
+      .catch(() => setUpsells([]));
+  }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const itemIds = new Set(items.map((i) => i.id));
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
@@ -43,7 +61,7 @@ export function CartDrawer() {
                   <div>
                     <p className="font-medium text-platinum">{item.name}</p>
                     <p className="text-sm text-platinum/50">
-                      {item.currency} {item.price.toFixed(2)}
+                      {formatCents(item.price_cents, item.currency)}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
                       <button
@@ -64,7 +82,7 @@ export function CartDrawer() {
 
                   <div className="text-right">
                     <p className="font-mono text-platinum">
-                      {item.currency} {(item.price * item.quantity).toFixed(2)}
+                      {formatCents(item.price_cents * item.quantity, item.currency)}
                     </p>
                     <button
                       onClick={() => removeItem(item.id)}
@@ -77,12 +95,50 @@ export function CartDrawer() {
               ))}
             </ul>
           )}
+
+          {upsells.length > 0 && (
+            <div className="mt-8 border-t border-platinum/10 pt-6">
+              <p className="font-heading text-sm font-semibold uppercase tracking-wider text-platinum/70">
+                Enhance your setup
+              </p>
+              <div className="mt-4 space-y-3">
+                {upsells
+                  .filter((u) => !itemIds.has(u.id))
+                  .map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between border border-platinum/10 bg-obsidian/50 p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-platinum">{product.name}</p>
+                        <p className="text-xs text-platinum/50">{formatCents(product.price_cents, product.currency)}</p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          addItem({
+                            id: product.id,
+                            name: product.name,
+                            slug: product.slug,
+                            price_cents: product.price_cents,
+                            currency: product.currency,
+                          })
+                        }
+                        className="flex items-center gap-1 rounded border border-cyan/30 px-3 py-1 text-xs font-semibold text-cyan transition hover:bg-cyan/10"
+                      >
+                        <PlusCircle className="h-3 w-3" />
+                        Add
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="border-t border-platinum/10 px-6 py-4">
           <div className="flex items-center justify-between">
             <span className="text-platinum/70">Total</span>
-            <span className="font-mono text-xl text-cyan">USD {total.toFixed(2)}</span>
+            <span className="font-mono text-xl text-cyan">{formatCents(total_cents)}</span>
           </div>
           <Link href="/en/checkout" className="mt-4 block w-full" onClick={() => setIsOpen(false)}>
             <Button className="w-full" disabled={items.length === 0}>Checkout</Button>
