@@ -1,4 +1,3 @@
-from decimal import Decimal
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
@@ -8,7 +7,7 @@ class ProductBase(BaseModel):
     name: str
     slug: str
     description: str | None = None
-    price: Decimal
+    price_cents: int
     currency: str = "USD"
     stock_quantity: int = 0
     is_active: bool = True

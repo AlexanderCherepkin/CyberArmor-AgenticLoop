@@ -1,5 +1,4 @@
 import asyncio
-from decimal import Decimal
 from sqlalchemy import select
 
 from app.db.session import AsyncSessionLocal
@@ -12,7 +11,7 @@ PRODUCTS = [
         "name": "SecureKey Standard",
         "slug": "securekey-standard",
         "description": "USB-A security token with AES-256-XTS and PIN protection.",
-        "price": Decimal("149.00"),
+        "price_cents": 14900,
         "currency": "USD",
         "stock_quantity": 1000,
     },
@@ -21,7 +20,7 @@ PRODUCTS = [
         "name": "SecureKey Pro",
         "slug": "securekey-pro",
         "description": "USB-C token with biometric scanner and EAL6+ secure element.",
-        "price": Decimal("249.00"),
+        "price_cents": 24900,
         "currency": "USD",
         "stock_quantity": 500,
     },
@@ -30,9 +29,28 @@ PRODUCTS = [
         "name": "SecureKey Enterprise",
         "slug": "securekey-enterprise",
         "description": "Ruggedized titanium body with AD/LDAP management support.",
-        "price": Decimal("399.00"),
+        "price_cents": 39900,
         "currency": "USD",
         "stock_quantity": 250,
+    },
+    # Upsell SKUs
+    {
+        "sku": "SK-CASE-AL",
+        "name": "SecureKey Aluminum Case",
+        "slug": "securekey-case",
+        "description": "Space-grade aluminum travel case with foam insert.",
+        "price_cents": 2900,
+        "currency": "USD",
+        "stock_quantity": 2000,
+    },
+    {
+        "sku": "SK-SPARE-STD",
+        "name": "SecureKey Spare Standard",
+        "slug": "securekey-spare",
+        "description": "Secondary fallback key for multi-location deployments.",
+        "price_cents": 9900,
+        "currency": "USD",
+        "stock_quantity": 1000,
     },
 ]
 

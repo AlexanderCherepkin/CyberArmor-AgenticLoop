@@ -13,3 +13,5 @@ passlib[bcrypt]>=1.7.4
 stripe>=11.3.0
 structlog>=24.4.0
 cryptography>=44.0.0
+celery[redis]>=5.4.0
+resend>=2.6.0
